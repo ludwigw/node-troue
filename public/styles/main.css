@@ -1,27 +1,249 @@
-.jumbotron {
-  background: #532F8C;
-  color: white;
-  padding-bottom: 80px; }
-  .jumbotron .btn-primary {
-    background: #845ac7;
-    border-color: #845ac7; }
-    .jumbotron .btn-primary:hover {
-      background: #7646c1; }
-  .jumbotron p {
-    color: #d9ccee;
-    max-width: 75%;
-    margin: 1em auto 2em; }
-  .navbar + .jumbotron {
-    margin-top: -20px; }
-  .jumbotron .lang-logo {
-    display: block;
-    background: #B01302;
-    border-radius: 50%;
-    overflow: hidden;
-    width: 100px;
-    height: 100px;
-    margin: auto;
-    border: 2px solid white; }
-    .jumbotron .lang-logo img {
-      max-width: 100%; }
+html {
+  font-family: "freight-text-pro",serif;
+  font-size: 62.5%;
+  background: #A3A5B9;
+  color: #405579;
+}
 
+body {
+  margin: 0;
+}
+
+#header {
+  background: url('/images/Header.svg');
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  font-size: 0;
+  color: transparent;
+  height: 50vh;
+  max-height: 50vh;
+  margin-left: -1rem;
+  margin-right: -1rem;
+}
+
+@media screen and (max-width: 510px) {
+  #header {
+    background-size: cover;
+  }
+}
+
+hr {
+  background: url('/images/Protea.svg');
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  font-size: 0;
+  color: transparent;
+  width: 100%;
+  height: 2rem;
+  border: none;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+
+}
+
+header {
+  background: #405579;
+  color: #FFF7EC;
+  padding-top: 4rem;
+  text-transform: uppercase;
+  font-size: 1.6rem;
+  letter-spacing: 0.3rem;
+  text-align: center;
+  padding-bottom: 3rem;
+  font-weight: normal;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+footer {
+  font-size: 2rem;
+  text-align: center;
+  margin-bottom: 3rem;
+  font-weight: normal;
+  padding-top: 2rem;
+  padding-bottom: 4rem;
+}
+
+p {
+  margin:0;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+a {
+  color: #E78D79;
+}
+
+footer a {
+  color: #405579;
+}
+
+footer a:hover {
+  color: #FFF7EC;
+}
+
+
+.button {
+  text-transform: uppercase;
+  letter-spacing: 0.3rem;
+  font-size: 0.75em;
+  font-weight: bold;
+  padding: 1rem;
+  background: #E78D79;
+  color: #FFF7EC;
+  text-decoration: none;
+  display: inline-block;
+  box-shadow: 0 0 20px rgba(0,0,0,0.3);
+  transition: 0.2s;
+  z-index: 0;
+  position: relative;
+  margin-bottom: 1rem;
+  margin-top: 1rem;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+#dietary-form .button {
+  background: #405579;
+  float: right;
+}
+
+.button:hover {
+  box-shadow: 0 0 100px rgba(0,0,0,0.1);
+  z-index: 1;
+}
+
+.button-no {
+  background: #A3A5B9;
+}
+
+.row {
+  display: flex;
+  margin: 0 auto;
+  max-width: 50em;
+}
+
+
+@media screen and (max-width: 600px) {
+  .row {
+      flex-wrap: wrap-reverse;
+  }
+}
+
+.col {
+  flex: 1 1 24em;
+  padding-left: 1em;
+  padding-right: 1em;
+}
+
+.col:last-child {
+  border-right: none;
+}
+
+h2 {
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #FFF7EC;
+  text-align: center;
+  margin-top: 6rem;
+}
+
+#dietary-form h2 {
+  text-align: left;
+  margin-top: 1rem;
+}
+
+#dietary-form h1 {
+  padding-top: 3rem;
+  margin-right: -2rem;
+}
+
+ul, li {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+textarea {
+    border: none;
+    font-size: 1.8rem;
+    padding: 1rem;
+    font-family: inherit;
+    margin-top: 1rem;
+    display: block;
+    width: calc(100% - 2rem);
+    min-height: 10rem;
+}
+
+#regret-form {
+  display: inline;
+}
+
+#dietary-form {
+  display: none;
+  position: fixed;
+  top: 3rem;
+  bottom: 3rem;
+  right: 3rem;
+  left: 3rem;
+  background: #E78D79;
+  text-align: center;
+  text-transform: none;
+  align-items: center;
+  justify-content: center;
+  text-align: left;
+  letter-spacing: 0;
+  overflow: auto;
+  z-index: 1000;
+  transition: 100ms;
+}
+
+#dietary:hover ~ #dietary-form {
+  top: 20vh;
+  bottom: 20vh;
+  right: 20vh;
+  left: 20vh;
+  filter: blur(5px);
+}
+
+.dietary-wrapper {
+    min-height: 10rem;
+    padding-left: 2rem;
+    padding-right: 2rem;
+    max-width: 32em;
+}
+
+#dietary {
+  display: none;
+}
+
+#dietary:target {
+  display: block;
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: rgba(0,0,0,0.3);
+  z-index: 1000;
+}
+
+#dietary:hover {
+  background: rgba(0,0,0,0.1);
+  filter: none;
+}
+
+#dietary-form label,
+#dietary-form input {
+  display: block;
+}
+
+#dietary:target ~ #dietary-form {
+  display: block;
+  display: flex;
+}

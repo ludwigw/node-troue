@@ -1,5 +1,6 @@
 var Mailchimp = require('mailchimp-api-v3');
 var mailchimp = new Mailchimp(process.env.MAILCHIMP_KEY);
+var list = process.env.MAILCHIMP_LIST;
 var express = require('express');
 var exphbs  = require('express-handlebars');
 var bodyParser = require('body-parser');
@@ -30,7 +31,7 @@ app.get('/', (request, response) => {
 	var q = request.query;
 
 	if(q.token && q.email) {
-		mailchimp.get('/lists/21aa3840b0/members/' + q.token).then( result => {
+		mailchimp.get('/lists/' + list + '/members/' + q.token).then( result => {
 			if (result.email_address != q.email) return null;
 			return result;
 		}).then( result => {
@@ -87,7 +88,7 @@ app.post('/rsvp', (request, response) => {
 
 		DIETARY = p['dietary-requirements'] ? p['dietary-requirements'] : null;
 
-		mailchimp.patch('/lists/21aa3840b0/members/' + p.token, {
+		mailchimp.patch('/lists/' + list + '/members/' + p.token, {
 			'merge_fields' :{
 				RSVP,
 				DIETARY

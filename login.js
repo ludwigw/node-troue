@@ -1,6 +1,6 @@
 var message = function(result) {
     return {
-        "html": "<p>Hello " + result.merge_fields.NAME + ",</p><p><a href='http://ludnat.wendzich.com/?token=" + result.id + "&email=" + result.email_address + "'>See your invitation to our wedding.</a></p><p>Cheers,<br>Natalie and Ludwig.</p>",
+        "html": "<p>Hello " + result.merge_fields.NAME + ",</p><p><a href='http://ludnat.wendzich.com/?token=" + result.unique_email_id + "&email=" + result.email_address + "'>See your invitation to our wedding.</a></p><p>Cheers,<br>Natalie and Ludwig.</p>",
         "subject": "Invitation to Natalie and Ludwig’s Wedding",
         "from_email": "ludwig@wendzich.com",
         "from_name": "Ludwig Wendzich",

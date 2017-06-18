@@ -34,8 +34,8 @@ app.get('/', (request, response) => {
 	var q = request.query;
 
 	if(q.token && q.email) {
-		mailchimp.get('/lists/' + list + '/members/' + q.token).then( result => {
-			if (result.email_address != q.email) return null;
+		mailchimp.get('/lists/' + list + '/members/' + md5(q.email)).then( result => {
+			if (result.unique_email_id != q.token) return null;
 			return result;
 		}).then( result => {
 			var hasRSVP, RSVP;

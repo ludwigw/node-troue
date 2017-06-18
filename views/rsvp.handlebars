@@ -4,7 +4,7 @@
 		<p><em>Eeep!</em> We can’t wait. So excited, cause…</p>
 		<p>We get to share our day with you, {{result.merge_fields.NAME}}!</p>
 		<hr />
-		<p><a href="/?token={{result.id}}&email={{result.email_address}}">Go Back</a></p>
+		<p><a href="/?token={{result.unique_email_id}}&email={{result.email_address}}">Go Back</a></p>
 	{{else}}
 		<h1>Awww…</h1>
 		<p>Thanks {{result.merge_fields.NAME}} for letting us know.</p>

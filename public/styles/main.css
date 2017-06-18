@@ -105,6 +105,7 @@ footer a:hover {
   cursor: pointer;
   font-family: inherit;
   -webkit-appearance: none;
+  border-radius: 0;
 }
 
 #dietary-form .button {

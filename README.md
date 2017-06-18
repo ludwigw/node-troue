@@ -9,6 +9,7 @@ Make sure you have the following file, `env.sh`:
 ```sh
 export MAILCHIMP_KEY=<API-Key>
 export MAILCHIMP_LIST=<List-ID>
+export MANDRILL_KEY=<API-Key>
 ```
 
 ```sh

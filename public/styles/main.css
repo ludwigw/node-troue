@@ -76,6 +76,11 @@ a {
   color: #E78D79;
 }
 
+.hidden-link {
+  text-decoration: inherit;
+  color: inherit;
+}
+
 footer a {
   color: #405579;
 }

@@ -89,6 +89,15 @@ footer a:hover {
   color: #FFF7EC;
 }
 
+input[type=email] {
+  padding: 0.55rem;
+  width: 20em;
+  border: none;
+  font-family: inherit;
+  font-size: 1.8rem;
+  vertical-align: middle;
+  max-width: calc(100% - 2rem);
+}
 
 .button {
   text-transform: uppercase;
@@ -148,6 +157,10 @@ footer a:hover {
 
 .col:last-child {
   border-right: none;
+}
+
+h1 {
+  text-transform: none;
 }
 
 h2 {

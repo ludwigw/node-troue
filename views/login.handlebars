@@ -1,0 +1,20 @@
+{{#if result}}
+<header>
+	<h1>Oh, hello {{result.merge_fields.NAME}}!</h1>
+	<p>Go check that email for a login link.</p>
+	<hr />
+	<p><a href="/">Go Back</a></p>
+</header>
+{{else}}
+<header>
+	<h1>Uh oh, we didn’t invite that email address.</h1>
+	<p>Check that you have the right email address and try again.</p>
+	<hr />
+	<p><a href="/">Go Back</a></p>
+</header>
+{{/if}}
+<footer>
+	<form method="POST" action="/login">
+		<input type="email" name="email" /><button type="submit" class="button">Send again</a>
+	</form>
+</footer>

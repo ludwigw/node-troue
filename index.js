@@ -1,9 +1,12 @@
 var Mailchimp = require('mailchimp-api-v3');
+var Mandrill = require('mandrill-api/mandrill');
 var mailchimp = new Mailchimp(process.env.MAILCHIMP_KEY);
+var mandrill = new Mandrill.Mandrill(process.env.MAINDRILL_KEY);
 var list = process.env.MAILCHIMP_LIST;
 var express = require('express');
 var exphbs  = require('express-handlebars');
 var bodyParser = require('body-parser');
+var md5 = require('js-md5');
 
 var app = express();
 
@@ -111,6 +114,40 @@ app.post('/rsvp', (request, response) => {
 				RSVP,
 				DIETARY
 			});
+		});
+	} else {
+		response.redirect('/');
+	}
+});
+
+app.post('/login', (request, response) => {
+	var p = request.body;
+
+	if(p.email) {
+		mailchimp.get('/lists/' + list + '/members/' + md5(p.email)).then( result => {
+
+			mandrill.messages.send({
+				"message": require("./login.js")(result),
+				"async": false,
+				"ip_pool": "Main Pool",
+				"send_at": "2000-01-05 12:42:01"
+			}, function(email_result) {
+    			response.render('login', {
+					result,
+					email_result
+				});
+
+			}, function(e) {
+			    // Mandrill returns the error as an object with name and message keys
+			    console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
+				response.redirect('/');
+
+			});
+
+		}, result => {
+			response.render('login', {
+					
+				});
 		});
 	} else {
 		response.redirect('/');

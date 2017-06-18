@@ -1,7 +1,7 @@
 var Mailchimp = require('mailchimp-api-v3');
 var Mandrill = require('mandrill-api/mandrill');
 var mailchimp = new Mailchimp(process.env.MAILCHIMP_KEY);
-var mandrill = new Mandrill.Mandrill(process.env.MAINDRILL_KEY);
+var mandrill = new Mandrill.Mandrill(process.env.MANDRILL_KEY);
 var list = process.env.MAILCHIMP_LIST;
 var express = require('express');
 var exphbs  = require('express-handlebars');

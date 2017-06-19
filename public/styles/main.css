@@ -139,20 +139,15 @@ input[type=email] {
 .row {
   display: flex;
   margin: 0 auto;
-  max-width: 50em;
-}
-
-
-@media screen and (max-width: 600px) {
-  .row {
-      flex-wrap: wrap-reverse;
-  }
+  justify-content: center;
+  flex-wrap: wrap-reverse;
 }
 
 .col {
   flex: 1 1 24em;
   padding-left: 1em;
   padding-right: 1em;
+  max-width: 24em;
 }
 
 .col:last-child {

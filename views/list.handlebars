@@ -9,12 +9,10 @@
 		<hr>
 		<ul>
 		{{#each coming}}
-			{{#with merge_fields}}
 				<li>
-					<h3><i class="fa fa-check"></i> {{NAME}}</h3>
-					<p>{{DIETARY}}</p>
+					<h3><a class="hidden-link" href="/?token={{unique_email_id}}&email={{email_address}}"><i class="fa fa-check"></i> {{merge_fields.NAME}}</a></h3>
+					<p>{{merge_fields.DIETARY}}</p>
 				</li>
-			{{/with}}
 		{{/each}}
 		</ul>
 	</div>
@@ -24,12 +22,10 @@
 		<hr>
 		<ul>
 		{{#each not_coming}}
-			{{#with merge_fields}}
 				<li>
-					<h3><i class="fa fa-close"></i> {{NAME}}</h3>
-					<p>{{DIETARY}}</p>
+					<h3><a class="hidden-link" href="/?token={{unique_email_id}}&email={{email_address}}"><i class="fa fa-close"></i> {{merge_fields.NAME}}</a></h3>
+					<p>{{merge_fields.DIETARY}}</p>
 				</li>
-			{{/with}}
 		{{/each}}
 		</ul>
 	</div>
@@ -39,12 +35,10 @@
 		<hr>
 		<ul>
 		{{#each waiting}}
-			{{#with merge_fields}}
 				<li>
-					<h3><i class="fa fa-clock-o"></i> {{NAME}}</h3>
-					<p>{{DIETARY}}</p>
+					<h3><a class="hidden-link" href="/?token={{unique_email_id}}&email={{email_address}}"><i class="fa fa-clock-o"></i> {{merge_fields.NAME}}</a></h3>
+					<p>{{merge_fields.DIETARY}}</p>
 				</li>
-			{{/with}}
 		{{/each}}
 		</ul>
 	</div>

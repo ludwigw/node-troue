@@ -210,6 +210,58 @@ app.get('/list', (request, response) => {
 
 });
 
+app.post('/notify', (request, response) => {
+	var p = request.body.data;
+
+	var NAME = p.merges.NAME;
+	var EMAIL = p.email;
+	var COUNT = p.merges.COUNT;
+	var DIETARY = p.merges.DIETARY || '';
+	var RSVP = parseInt(p.merges.RSVP) > 1 ? "Yes" : "No";
+
+	mandrill.messages.send({
+		"message": {
+	        "html": "<p>" + NAME + "(" + COUNT + ") has RSVPd (" + RSVP + ").</p><p>" + DIETARY + "</p>",
+	        "subject": "RSVP: " + p.merge.NAME + " (" + RSVP + ")",
+	        "from_email": EMAIL,
+	        "from_name": NAME,
+	        "auto_text": true,
+	        "to": [{
+	                "email": "ludwig@wendzich.com",
+	                "name": "Ludwig Wendzich",
+	                "type": "to"
+	            },
+	            {
+	                "email": "theron.natalie@gmail.com",
+	                "name": "Natalie Theron",
+	                "type": "to"
+	            }],
+	        "headers": {
+	            "Reply-To": "ludwig@wendzich.com"
+	        },
+	        "view_content_link": true
+	    },
+		"async": false,
+		"ip_pool": "Main Pool",
+		"send_at": "2000-01-05 12:42:01"
+	}, function(email_result) {
+		response.render('login', {
+			result,
+			email_result
+		});
+
+	}, function(e) {
+	    // Mandrill returns the error as an object with name and message keys
+	    console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
+		response.redirect('/');
+
+	});
+
+	response.status(200);
+    response.send();
+
+});
+
 app.listen(app.get('port'),() => {
   console.log('Node app is running on port', app.get('port'));
 });

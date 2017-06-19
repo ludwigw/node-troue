@@ -222,7 +222,7 @@ app.post('/notify', (request, response) => {
 	mandrill.messages.send({
 		"message": {
 	        "html": "<p>" + NAME + "(" + COUNT + ") has RSVPd (" + RSVP + ").</p><p>" + DIETARY + "</p>",
-	        "subject": "RSVP: " + p.merge.NAME + " (" + RSVP + ")",
+	        "subject": "RSVP: " + NAME + " (" + RSVP + ")",
 	        "from_email": EMAIL,
 	        "from_name": NAME,
 	        "auto_text": true,
@@ -244,11 +244,9 @@ app.post('/notify', (request, response) => {
 		"async": false,
 		"ip_pool": "Main Pool",
 		"send_at": "2000-01-05 12:42:01"
-	}, function(email_result) {
-		response.render('login', {
-			result,
-			email_result
-		});
+	}, function(result) {
+			response.status(200);
+		    response.send();
 
 	}, function(e) {
 	    // Mandrill returns the error as an object with name and message keys

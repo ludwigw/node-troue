@@ -210,6 +210,12 @@ app.get('/list', (request, response) => {
 
 });
 
+app.get('/notify', (request, response) => {
+	response.status(200);
+    response.send();
+
+});
+
 app.post('/notify', (request, response) => {
 	var p = request.body.data;
 

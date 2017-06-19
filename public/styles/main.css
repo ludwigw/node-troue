@@ -269,18 +269,37 @@ textarea {
 }
 
 .members {
-  max-width: 20em;
-  margin: 0 auto;
+  display: flex;
   text-align: left;
-  padding-left: 3rem;
-  padding-right: 3rem;
+  justify-content: center;
+  flex-wrap: wrap;
 }
 
-.members h2 {
+.members > div {
+  flex: 1 1 16em;
+  max-width: 16em;
+  padding-left:3rem;
+  padding-right:3rem;
+}
+
+.members h1 {
+  text-align: center;
+  margin: 0;
+  margin-bottom: -5rem;
+  color: #FFF7EC;
+}
+
+.members h3 {
   text-align: left;
   margin-top: 2rem;
 }
 
-.members h2 .fa {
-    margin-left: -2rem
+.members h3 .fa {
+    margin-left: -2.5rem
+}
+
+.members p {
+  margin-top: -2rem;
+  font-style: italic;
+  margin-bottom: -1rem
 }

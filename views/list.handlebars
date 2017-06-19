@@ -1,16 +1,51 @@
 <header>
 	<h1>Who’s coming, or not</h1>
-	<p><i class="fa {{icon 2}}"></i> {{COMING}} <i class="fa {{icon 1}}"></i> {{NOT_COMING}} <i class="fa {{icon 0}}"></i> {{WAITING}}</p>
 </header>
 <footer>
-<ul class="members">
-{{#each members}}
-	{{#with merge_fields}}
-		<li>
-			<h2><i class="fa {{icon RSVP}}"></i>{{NAME}}</h2>
-			<p>{{DIETARY}}</p>
-		</li>
-	{{/with}}
-{{/each}}
-</ul>
+<div class="members">
+	<div class="coming">
+		<h1>{{COMING}}</h1>
+		<h2>Coming</h2>
+		<hr>
+		<ul>
+		{{#each coming}}
+			{{#with merge_fields}}
+				<li>
+					<h3><i class="fa fa-check"></i> {{NAME}}</h3>
+					<p>{{DIETARY}}</p>
+				</li>
+			{{/with}}
+		{{/each}}
+		</ul>
+	</div>
+	<div class="not_coming">
+		<h1>{{NOT_COMING}}</h1>
+		<h2>Not Coming</h2>
+		<hr>
+		<ul>
+		{{#each not_coming}}
+			{{#with merge_fields}}
+				<li>
+					<h3><i class="fa fa-close"></i> {{NAME}}</h3>
+					<p>{{DIETARY}}</p>
+				</li>
+			{{/with}}
+		{{/each}}
+		</ul>
+	</div>
+	<div class="waiting">
+		<h1>{{WAITING}}</h1>
+		<h2>Waiting</h2>
+		<hr>
+		<ul>
+		{{#each waiting}}
+			{{#with merge_fields}}
+				<li>
+					<h3><i class="fa fa-clock-o"></i> {{NAME}}</h3>
+					<p>{{DIETARY}}</p>
+				</li>
+			{{/with}}
+		{{/each}}
+		</ul>
+	</div>
 </footer>

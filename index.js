@@ -170,6 +170,8 @@ app.get('/list', (request, response) => {
 	if(token && token == process.env.MAILCHIMP_KEY) {
 		mailchimp.get('/lists/' + list + '/members/?count=100').then( result => {
 			var COMING = 0, NOT_COMING = 0, WAITING = 0;
+			var coming = [], not_coming = [], waiting = [];
+
 			var members = result.members.sort(function (a, b) {
 			  return b.merge_fields.RSVP - a.merge_fields.RSVP;
 			});
@@ -178,20 +180,27 @@ app.get('/list', (request, response) => {
 				switch(member.merge_fields.RSVP){
 					case 2:
 					COMING += member.merge_fields.COUNT;
+					coming.push(member);
 					break;
+
 					case  1:
 					NOT_COMING += member.merge_fields.COUNT;
+					not_coming.push(member);
 					break;
+
 					default:
 					WAITING += member.merge_fields.COUNT;
+					waiting.push(member);
 					break;
 				}
 			});
 
 			response.render('list', {
-				members: result.members,
+				coming,
 				COMING,
+				not_coming,
 				NOT_COMING,
+				waiting,
 				WAITING
 			});
 		});

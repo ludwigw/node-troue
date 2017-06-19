@@ -18,6 +18,16 @@ app.engine('handlebars', exphbs({
 		        return singular;
 		    else
 		        return (typeof plural === 'string' ? plural : singular + 's');
+		},
+		icon: function(number) {
+			switch(number){
+				case 2:
+				return "fa-check";
+				case  1:
+				return "fa-close";
+				default:
+				return "fa-clock-o";
+			}
 		}
 	}
 }));
@@ -152,6 +162,43 @@ app.post('/login', (request, response) => {
 	} else {
 		response.redirect('/');
 	}
+});
+
+app.get('/list', (request, response) => {
+	var token = request.query ? request.query['token'] : null;
+
+	if(token && token == process.env.MAILCHIMP_KEY) {
+		mailchimp.get('/lists/' + list + '/members/?count=100').then( result => {
+			var COMING = 0, NOT_COMING = 0, WAITING = 0;
+			var members = result.members.sort(function (a, b) {
+			  return b.merge_fields.RSVP - a.merge_fields.RSVP;
+			});
+
+			members.forEach(function(member){
+				switch(member.merge_fields.RSVP){
+					case 2:
+					COMING += member.merge_fields.COUNT;
+					break;
+					case  1:
+					NOT_COMING += member.merge_fields.COUNT;
+					break;
+					default:
+					WAITING += member.merge_fields.COUNT;
+					break;
+				}
+			});
+
+			response.render('list', {
+				members: result.members,
+				COMING,
+				NOT_COMING,
+				WAITING
+			});
+		});
+	} else {
+		response.redirect('/');
+	}
+
 });
 
 app.listen(app.get('port'),() => {

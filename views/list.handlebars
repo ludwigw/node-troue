@@ -1,0 +1,16 @@
+<header>
+	<h1>Who’s coming, or not</h1>
+	<p><i class="fa {{icon 2}}"></i> {{COMING}} <i class="fa {{icon 1}}"></i> {{NOT_COMING}} <i class="fa {{icon 0}}"></i> {{WAITING}}</p>
+</header>
+<footer>
+<ul class="members">
+{{#each members}}
+	{{#with merge_fields}}
+		<li>
+			<h2><i class="fa {{icon RSVP}}"></i>{{NAME}}</h2>
+			<p>{{DIETARY}}</p>
+		</li>
+	{{/with}}
+{{/each}}
+</ul>
+</footer>

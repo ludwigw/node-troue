@@ -266,6 +266,28 @@ app.post('/notify', (request, response) => {
 
 });
 
+app.get('/tokenize', (request, response) => {
+
+	mailchimp.get('/lists/' + list + '/members/?count=100&status=subscribed').then( result => {
+
+			var members = result.members;
+
+			members.forEach(function(member){
+				var TOKEN = member.unique_email_id;
+				mailchimp.patch('/lists/' + list + '/members/' + member.id, {
+					'merge_fields' :{
+						TOKEN
+					}
+				}).then( result => {
+					console.log(result.merge_fields)
+				});
+			});
+
+			response.status(200);
+			response.send();
+		});
+});
+
 app.listen(app.get('port'),() => {
   console.log('Node app is running on port', app.get('port'));
 });

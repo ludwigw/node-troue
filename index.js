@@ -168,7 +168,7 @@ app.get('/list', (request, response) => {
 	var token = request.query ? request.query['token'] : null;
 
 	if(token && token == process.env.MAILCHIMP_KEY) {
-		mailchimp.get('/lists/' + list + '/members/?count=100').then( result => {
+		mailchimp.get('/lists/' + list + '/members/?count=100&status=subscribed').then( result => {
 			var COMING = 0, NOT_COMING = 0, WAITING = 0;
 			var coming = [], not_coming = [], waiting = [];
 

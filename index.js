@@ -288,7 +288,7 @@ app.post('/notify', (request, response) => {
 		smartEmailID: '4829db53-0d8d-4289-b91c-90df6f76443c',
 		to: [
 			"Ludwig Wendzich <ludwig@wendzich.com>",
-			"Natalie Theron <theron.natalie@gmail.com"
+			"Natalie Theron <theron.natalie@gmail.com>"
 		],
 		data: {
 		    "Name": rsvp.Name,

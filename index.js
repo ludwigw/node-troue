@@ -302,7 +302,7 @@ app.post('/notify', (request, response) => {
 
 	createsend.transactional.sendSmartEmail(details, function (err, res) {
 		if (err) {
-		    console.log('A CM error occurred: ' + e.name + ' - ' + e.message);
+		    console.log(err);
 			response.redirect('/');
 		} else {
 			response.status(200);

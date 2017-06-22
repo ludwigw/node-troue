@@ -1,37 +1,40 @@
-{{#if result}}
-<header id="rsvp-row">
-	<p>{{result.merge_fields.NAME}},</p>
-	<p>Come celebrate the union of </p>
-	<h1 id="header">Natalie & Ludwig</h1>
-	<p>9 December 2017</p>
-	<p><a class="hidden-link" href="http://maps.apple.com/?daddr=-36.9950,174.7940">Abbeville Estate, Auckland, NZ</a></p>
-	<hr />
-	<p>Ceremony starts at 3:30pm</p>
-	<p>Dinner and dancing follows.</p>
+{{#if rsvp}}
+	{{#with rsvp}}
+		<header id="rsvp-row">
+			<p>{{Name}},</p>
+			<p>Come celebrate the union of </p>
+			<h1 id="header">Natalie & Ludwig</h1>
+			<p>9 December 2017</p>
+			<p><a class="hidden-link" href="http://maps.apple.com/?daddr=-36.9950,174.7940">Abbeville Estate, Auckland, NZ</a></p>
+			<hr />
+			<p>Ceremony starts at 3:30pm</p>
+			<p>Dinner and dancing follows.</p>
 
-	{{#if hasRSVP}}
-		</header>
-		<footer>
-			<a id="dietary" href="#rsvp-row"></a>
-			{{#if RSVP}}
-				<div>We’re expecting {{result.merge_fields.COUNT}} of you. {{#> regret}}But {{pluralize result.merge_fields.COUNT "I" "we"}}  can’t come.{{/regret}}</div>
+			{{#if hasRSVP}}
+
+				</header>
+				<footer>
+					<a id="dietary" href="#rsvp-row"></a>
+					{{#if RSVP}}
+						<div>We’re expecting {{Count}} of you. {{#> regret}}But {{pluralize Count "I" "we"}}  can’t come.{{/regret}}</div>
+					{{else}}
+						<p id="rsvp-row">We think you aren’t coming. {{#> accept_start}}{{pluralize Count "I" "We"}}  can now!{{/accept_start}}</p>
+						{{> accept_end}}
+
+					{{/if}}
+
 			{{else}}
-				<p id="rsvp-row">We think you aren’t coming. {{#> accept_start}}{{pluralize result.merge_fields.COUNT "I" "We"}}  can now!{{/accept_start}}</p>
-				{{> accept_end}}
+				<a id="dietary" href="#rsvp-row"></a>
+				<div> RSVP 
+					{{#> accept_start}}Count {{pluralize Count "me" "us"}} in!{{/accept_start}}
+					{{#> regret}}{{pluralize Count "I" "We"}}’ll celebrate from afar{{/regret}}
+				</div>
+					{{> accept_end}}
 
+				</header>
+			<footer>
 			{{/if}}
-
-	{{else}}
-		<a id="dietary" href="#rsvp-row"></a>
-		<div> RSVP 
-			{{#> accept_start}}Count {{pluralize result.merge_fields.COUNT "me" "us"}} in!{{/accept_start}}
-			{{#> regret}}{{pluralize result.merge_fields.COUNT "I" "We"}}’ll celebrate from afar{{/regret}}
-		</div>
-			{{> accept_end}}
-
-		</header>
-	<footer>
-	{{/if}}
+	{{/with}}
 {{else}}
 <header>
 	<p>Celebrate the union of</p>
@@ -46,7 +49,7 @@
 </header>
 {{/if}}
 
-{{#if result}}
+{{#if rsvp}}
     {{> info}}
 </footer>
 {{/if}}

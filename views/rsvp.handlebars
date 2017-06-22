@@ -1,30 +1,32 @@
-<header>
+{{#with rsvp}}
+	<header>
+		{{#if RSVP}}
+			<h1>Yes!</h1>
+			<p><em>Eeep!</em> We can’t wait. So excited, cause…</p>
+			<p>We get to share our day with you, {{Name}}!</p>
+			<hr />
+			<p><a href="/?token={{Token}}&email={{Email}}">Go Back</a></p>
+		{{else}}
+			<h1>Awww…</h1>
+			<p>Thanks {{Name}} for letting us know.</p>
+			<p>We’re sure you’ll be dancing wherever you are.</p>
+		{{/if}}
+
+	</header>
+
+	<footer>
+		<a id="dietary" href="#rsvp-row"></a>
+		<div id="rsvp-row"> Oops! {{pluralize Count "I" "We"}} made a mistake, 
+		{{#unless RSVP}}
+			{{#> accept_start}}Count {{pluralize Count "me" "us"}} in!{{/accept_start}}
+		{{else}}
+			{{#> regret}}{{pluralize Count "I" "We"}}’ll actually celebrate from afar.{{/regret}}
+		{{/unless}}
+		</div>
+		{{> accept_end}}
+
 	{{#if RSVP}}
-		<h1>Yes!</h1>
-		<p><em>Eeep!</em> We can’t wait. So excited, cause…</p>
-		<p>We get to share our day with you, {{result.merge_fields.NAME}}!</p>
-		<hr />
-		<p><a href="/?token={{result.unique_email_id}}&email={{result.email_address}}">Go Back</a></p>
-	{{else}}
-		<h1>Awww…</h1>
-		<p>Thanks {{result.merge_fields.NAME}} for letting us know.</p>
-		<p>We’re sure you’ll be dancing wherever you are.</p>
+	    {{> info}}
+	</footer>
 	{{/if}}
-
-</header>
-
-<footer>
-	<a id="dietary" href="#rsvp-row"></a>
-	<div id="rsvp-row"> Oops! {{pluralize result.merge_fields.COUNT "I" "We"}} made a mistake, 
-	{{#unless RSVP}}
-		{{#> accept_start}}Count {{pluralize result.merge_fields.COUNT "me" "us"}} in!{{/accept_start}}
-	{{else}}
-		{{#> regret}}{{pluralize result.merge_fields.COUNT "I" "We"}}’ll actually celebrate from afar.{{/regret}}
-	{{/unless}}
-	</div>
-	{{> accept_end}}
-
-{{#if RSVP}}
-    {{> info}}
-</footer>
-{{/if}}
+{{/with}}

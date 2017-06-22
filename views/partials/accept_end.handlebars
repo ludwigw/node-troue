@@ -1,11 +1,12 @@
 		<form id="dietary-form" method="POST" action="/rsvp">
 			<div class="dietary-wrapper">
 				<h1>Almost done!</h1>
-				<h2>This RSVP is for {{result.merge_fields.COUNT}} of you.</h2>
+				<h2>This RSVP is for {{Count}} of you.</h2>
 				<label for="dietary-requirements"> Do either of you have dietary requirements? <em>Optional</em></label>
-				<textarea name="dietary-requirements" id="dietary-requirements">{{result.merge_fields.DIETARY}}</textarea>
+				<textarea name="dietary-requirements" id="dietary-requirements">{{Dietary}}</textarea>
 				<input type="hidden" name="answer" value="yes" />
-				<input type="hidden" name="token" value="{{result.id}}" />
+				<input type="hidden" name="email" value="{{Email}}" />
+				<input type="hidden" name="token" value="{{Token}}" />
 				<button type="submit" class="button">RSVP me, already!</button>
 			</div>
 		</form>

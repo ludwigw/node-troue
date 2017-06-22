@@ -10,8 +10,8 @@
 		<ul>
 		{{#each coming}}
 				<li>
-					<h3><a class="hidden-link" href="/?token={{unique_email_id}}&email={{email_address}}"><i class="fa fa-check"></i> {{merge_fields.NAME}}</a></h3>
-					<p>{{merge_fields.DIETARY}}</p>
+					<h3><a class="hidden-link" href="/?token={{Token}}&email={{Email}}"><i class="fa fa-check"></i> {{Name}}</a></h3>
+					<p>{{Dietary}}</p>
 				</li>
 		{{/each}}
 		</ul>
@@ -23,8 +23,8 @@
 		<ul>
 		{{#each not_coming}}
 				<li>
-					<h3><a class="hidden-link" href="/?token={{unique_email_id}}&email={{email_address}}"><i class="fa fa-close"></i> {{merge_fields.NAME}}</a></h3>
-					<p>{{merge_fields.DIETARY}}</p>
+					<h3><a class="hidden-link" href="/?token={{Token}}&email={{Email}}"><i class="fa fa-close"></i> {{Name}}</a></h3>
+					<p>{{Dietary}}</p>
 				</li>
 		{{/each}}
 		</ul>
@@ -36,8 +36,8 @@
 		<ul>
 		{{#each waiting}}
 				<li>
-					<h3><a class="hidden-link" href="/?token={{unique_email_id}}&email={{email_address}}"><i class="fa fa-clock-o"></i> {{merge_fields.NAME}}</a></h3>
-					<p>{{merge_fields.DIETARY}}</p>
+					<h3><a class="hidden-link" href="/?token={{Token}}&email={{Email}}"><i class="fa fa-clock-o"></i> {{Name}}</a></h3>
+					<p>{{Dietary}}</p>
 				</li>
 		{{/each}}
 		</ul>

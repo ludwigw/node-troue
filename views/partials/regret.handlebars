@@ -1,5 +1,6 @@
 <form id="regret-form" method="POST" action="/rsvp">
 	<input type="hidden" name="answer" value="no" />
-	<input type="hidden" name="token" value="{{result.id}}" />
+	<input type="hidden" name="email" value="{{Email}}" />
+	<input type="hidden" name="token" value="{{Token}}" />
 	<button type="submit" class="button button-no">{{> @partial-block }}</button>
 </form>

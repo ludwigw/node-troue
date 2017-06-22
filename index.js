@@ -1,8 +1,14 @@
 var Mailchimp = require('mailchimp-api-v3');
 var Mandrill = require('mandrill-api/mandrill');
+var CreateSend = require('createsend-node');
+
 var mailchimp = new Mailchimp(process.env.MAILCHIMP_KEY);
 var mandrill = new Mandrill.Mandrill(process.env.MANDRILL_KEY);
+var createsend = new CreateSend({ apiKey: process.env.CREATESEND_KEY});
+
 var list = process.env.MAILCHIMP_LIST;
+var cmList = process.env.CREATESEND_LIST;
+
 var express = require('express');
 var exphbs  = require('express-handlebars');
 var bodyParser = require('body-parser');
@@ -299,6 +305,47 @@ app.get('/tokenize', (request, response) => {
 			});
 
 		});
+});
+
+app.get('/transfer', (request, response) => {
+
+	mailchimp.get('/lists/' + list + '/members/?count=100&status=subscribed').then( result => {
+
+			var members = result.members;
+			var calls = [];
+
+			members.forEach(function(member){
+				calls.push((done)=> {
+
+					createsend.subscribers.updateSubscriber(cmList, member.email_address, {
+						Name: member.merge_fields.NAME,
+						CustomFields: [
+							{ Key: 'Token', Value: member.merge_fields.TOKEN },
+							{ Key: 'Count', Value: member.merge_fields.COUNT },
+							{ Key: 'RSVP', Value: member.merge_fields.RSVP },
+							{ Key: 'Dietary', Value: member.merge_fields.DIETARY },
+							{ Key: 'Lang', Value: member.merge_fields.LANG }
+						]
+					}, (err, res) => {
+					  if (err) console.log(err);
+					  console.log("Updated:" + member.email_address);
+					  done();
+					});
+
+				});
+
+			});
+
+			async.parallelLimit(calls, 10, () => {
+
+				console.log("Done.");
+				response.status(200);
+				response.send();
+
+			});
+
+		});
+
 });
 
 app.listen(app.get('port'),() => {

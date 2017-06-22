@@ -26,7 +26,7 @@ var createRSVP = function (result) {
 
 	// Flatten Custom Fields
 	result.CustomFields.forEach(function(field) {
-		response[field.Key] = field.Value;
+		response[field.Key.replace(/[\[\]]/gi, '')] = field.Value;
 	});
 
 	// Update RSVP Value
@@ -234,29 +234,26 @@ app.get('/list', (request, response) => {
 
 	if(token && token == process.env.CREATESEND_KEY) {
 
-		createsend.lists.getActiveSubscribers(cmList, '', (res) => {
+		createsend.lists.getActiveSubscribers(cmList, '', (err, res) => {
 
 			var COMING = 0, NOT_COMING = 0, WAITING = 0;
 			var coming = [], not_coming = [], waiting = [];
 
 			res.Results.forEach(function(result){
+				
 				var member = createRSVP(result);
 
-				switch(member.RSVP){
-					case 2:
-					COMING += member.Count;
-					coming.push(member);
-					break;
-
-					case  1:
-					NOT_COMING += member.Count;
-					not_coming.push(member);
-					break;
-
-					default:
-					WAITING += member.Count;
+				if(member.hasRSVP) {
+					if(member.RSVP == true) {
+						COMING += parseInt(member.Count);
+						coming.push(member);
+					} else {
+						NOT_COMING += parseInt(member.Count);
+						not_coming.push(member);
+					}
+				} else {
+					WAITING += parseInt(member.Count);
 					waiting.push(member);
-					break;
 				}
 			});
 

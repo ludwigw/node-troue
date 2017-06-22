@@ -7,6 +7,7 @@ var express = require('express');
 var exphbs  = require('express-handlebars');
 var bodyParser = require('body-parser');
 var md5 = require('js-md5');
+var async = require('async');
 
 var app = express();
 
@@ -271,20 +272,32 @@ app.get('/tokenize', (request, response) => {
 	mailchimp.get('/lists/' + list + '/members/?count=100&status=subscribed').then( result => {
 
 			var members = result.members;
+			var calls = [];
 
 			members.forEach(function(member){
 				var TOKEN = member.unique_email_id;
-				mailchimp.patch('/lists/' + list + '/members/' + member.id, {
-					'merge_fields' :{
-						TOKEN
-					}
-				}).then( result => {
-					console.log(result.merge_fields)
+				calls.push((done)=>{
+
+					mailchimp.patch('/lists/' + list + '/members/' + member.id, {
+						'merge_fields' :{
+							TOKEN
+						}
+					}).then( result => {
+						console.log(result.merge_fields)
+						done();
+					});
+
 				});
 			});
 
-			response.status(200);
-			response.send();
+			async.parallelLimit(calls, 10, () => {
+
+				console.log("Done");
+				response.status(200);
+				response.send();
+
+			});
+
 		});
 });
 

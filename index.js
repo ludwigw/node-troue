@@ -265,32 +265,42 @@ app.get('/list', (request, response) => {
 // Send a notification to Natalie and myself that an RSVP has occurred.
 app.post('/notify', (request, response) => {
 
-	var rsvp = createRSVP(request.body.Events[0]);
-	var details = {
-		smartEmailID: '4829db53-0d8d-4289-b91c-90df6f76443c',
-		to: [
-			"Ludwig Wendzich <ludwig@wendzich.com>",
-			"Natalie Theron <theron.natalie@gmail.com>"
-		],
-		data: {
-		    "Name": rsvp.Name,
-			"RSVP": rsvp.RSVP,
-			"Count": rsvp.Count,
-			"Dietary": rsvp.Dietary || '',
-			"Token": rsvp.Token,
-			"email": rsvp.Email
-		}
-	}
+	var calls= [];
 
-	createsend.transactional.sendSmartEmail(details, function (err, res) {
+	request.body.Events.forEach(event => {
+		var rsvp = createRSVP(event);
+		var details = {
+			smartEmailID: '4829db53-0d8d-4289-b91c-90df6f76443c',
+			to: [
+				"Ludwig Wendzich <ludwig@wendzich.com>",
+				"Natalie Theron <theron.natalie@gmail.com>"
+			],
+			data: {
+			    "Name": rsvp.Name,
+				"RSVP": rsvp.RSVP,
+				"Count": rsvp.Count,
+				"Dietary": rsvp.Dietary || '',
+				"Token": rsvp.Token,
+				"email": rsvp.Email
+			}
+		}
+
+		calls.push((done)=> {
+			createsend.transactional.sendSmartEmail(details, done);
+		});
+	});
+
+	async.parallelLimit(calls, 10, (err, res) => {
 		if (err) {
 		    console.log(err);
-			response.redirect('/');
+			response.status(500);
+		    response.send();
 		} else {
 			response.status(200);
 		    response.send();
 		}
 	});
+
 
 });
 

@@ -1,19 +1,12 @@
-var Mailchimp = require('mailchimp-api-v3');
-var Mandrill = require('mandrill-api/mandrill');
 var CreateSend = require('createsend-node');
-
-var mailchimp = new Mailchimp(process.env.MAILCHIMP_KEY);
-var mandrill = new Mandrill.Mandrill(process.env.MANDRILL_KEY);
-var createsend = new CreateSend({ apiKey: process.env.CREATESEND_KEY});
-
-var list = process.env.MAILCHIMP_LIST;
-var cmList = process.env.CREATESEND_LIST;
-
 var express = require('express');
 var exphbs  = require('express-handlebars');
 var bodyParser = require('body-parser');
-var md5 = require('js-md5');
 var async = require('async');
+var uid = require('rand-token').uid;
+
+var createsend = new CreateSend({ apiKey: process.env.CREATESEND_KEY});
+var list = process.env.CREATESEND_LIST;
 
 var app = express();
 
@@ -49,6 +42,10 @@ var createRSVP = function (result) {
 	return response;
 };
 
+var generateToken = function (result) {
+	return uid(10);
+}
+
 app.engine('handlebars', exphbs({
 	defaultLayout: 'main',
 	helpers: {
@@ -78,6 +75,7 @@ app.use(express.static('public'));
 app.use(bodyParser.json()); // support json encoded bodies
 app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 
+// View an Invitation
 app.get('/', (request, response) => {
 
 	var q = request.query;
@@ -85,7 +83,7 @@ app.get('/', (request, response) => {
 
 	if(q.token && q.email) {
 
-		createsend.subscribers.getSubscriberDetails(cmList, q.email, (err, res) => {
+		createsend.subscribers.getSubscriberDetails(list, q.email, (err, res) => {
 
 			var rsvp;
 
@@ -110,6 +108,7 @@ app.get('/', (request, response) => {
 	}
 });
 
+// Submit an RSVP response.
 app.post('/rsvp', (request, response) => {
 	var p = request.body;
 
@@ -140,14 +139,10 @@ app.post('/rsvp', (request, response) => {
 
 		async.waterfall([
 			(done) => {
-				createsend.subscribers.updateSubscriber(cmList, p.email, {
-					CustomFields: data
-				}, done);
+				createsend.subscribers.updateSubscriber(list, p.email, { CustomFields: data }, done);
 			},
 			(done) => {
-				setTimeout(()=> {
-					createsend.subscribers.getSubscriberDetails(cmList, p.email, done);
-				},100);
+				createsend.subscribers.getSubscriberDetails(list, p.email, done);
 			}
 		], (err, res) => {
 			var rsvp;
@@ -175,6 +170,7 @@ app.post('/rsvp', (request, response) => {
 	}
 });
 
+// Send a login link to the email if it is invited.
 app.post('/login', (request, response) => {
 	var p = request.body;
 	var rsvp;
@@ -189,10 +185,10 @@ app.post('/login', (request, response) => {
 		async.waterfall([
 			(done) => {
 
-				createsend.subscribers.getSubscriberDetails(cmList, p.email, (err, res) => {
+				createsend.subscribers.getSubscriberDetails(list, p.email, (err, res) => {
 
 					if(err) {
-						done("No invite");
+						return done("No invite");
 					} else {
 
 						rsvp = createRSVP(res);
@@ -208,15 +204,7 @@ app.post('/login', (request, response) => {
 				});
 			},
 			(done) => {
-
-				createsend.transactional.sendSmartEmail(details, function (err, res) {
-				    if (err) {
-				        done(err);
-				    } else {
-				        done();
-				    }
-				});
-
+				createsend.transactional.sendSmartEmail(details, done);
 			}
 		], (err, res) => {
 			response.render('login', {
@@ -229,18 +217,19 @@ app.post('/login', (request, response) => {
 	}
 });
 
+// See a list of all subscribers organised by RSVP status.
 app.get('/list', (request, response) => {
 	var token = request.query ? request.query['token'] : null;
 
 	if(token && token == process.env.CREATESEND_KEY) {
 
-		createsend.lists.getActiveSubscribers(cmList, '', (err, res) => {
+		createsend.lists.getActiveSubscribers(list, '', (err, res) => {
 
 			var COMING = 0, NOT_COMING = 0, WAITING = 0;
 			var coming = [], not_coming = [], waiting = [];
 
 			res.Results.forEach(function(result){
-				
+
 				var member = createRSVP(result);
 
 				if(member.hasRSVP) {
@@ -270,13 +259,6 @@ app.get('/list', (request, response) => {
 	} else {
 		response.redirect('/');
 	}
-
-});
-
-// Let’s MailChimp confirm the webhook handler exists
-app.get('/notify', (request, response) => {
-	response.status(200);
-    response.send();
 
 });
 
@@ -314,9 +296,9 @@ app.post('/notify', (request, response) => {
 
 app.get('/create-webhook', (request, response) => {
 
-	createsend.lists.createWebhook(cmList, {
+	createsend.lists.createWebhook(list, {
 	    "Events": [ "Update" ],
-	    "Url": "ludnat.wendzich.com/notify",
+	    "Url": "http://ludnat.wendzich.com/notify",
 	    "PayloadFormat": "json"
 	}, (err, res) => {
 		console.log(res);
@@ -336,81 +318,44 @@ app.get('/test-webhook', (request, response) => {
 
 });
 
-// Save MailChimp Unique Email ID to Merge Field: TOKEN
+// Generate tokens for Subscribers without Tokens.
 app.get('/tokenize', (request, response) => {
 
-	mailchimp.get('/lists/' + list + '/members/?count=100&status=subscribed').then( result => {
+	var calls = [];
 
-			var members = result.members;
-			var calls = [];
+	createsend.lists.getActiveSubscribers(list, '', (err, res) => {
+		var results = res.Results;
 
-			members.forEach(function(member){
-				var TOKEN = member.unique_email_id;
-				calls.push((done)=>{
+		results.forEach(result => {
+			result = createRSVP(result);
 
-					mailchimp.patch('/lists/' + list + '/members/' + member.id, {
-						'merge_fields' :{
-							TOKEN
-						}
-					}).then( result => {
-						console.log(result.merge_fields)
-						done();
-					});
-
+			if(!result.Token) {
+				calls.push((done)=> {
+					createsend.subscribers.updateSubscriber(list, result.Email,
+						{
+							CustomFields: {
+								Token: generateToken(result)
+							}
+						}, done);
 				});
-			});
-
-			async.parallelLimit(calls, 10, () => {
-
-				console.log("Done");
-				response.status(200);
-				response.send();
-
-			});
+			}
 
 		});
-});
 
-// Copy details from MailChimp to CampaignMonitor
-// Requires Members in MailChimp to already exist as Subscribers in CampaignMonitor
-app.get('/transfer', (request, response) => {
+		async.parallelLimit(calls, 10, (err, res) => {
 
-	mailchimp.get('/lists/' + list + '/members/?count=100&status=subscribed').then( result => {
-
-			var members = result.members;
-			var calls = [];
-
-			members.forEach(function(member){
-				calls.push((done) => {
-
-					createsend.subscribers.updateSubscriber(cmList, member.email_address, {
-						Name: member.merge_fields.NAME,
-						CustomFields: [
-							{ Key: 'Token', Value: member.merge_fields.TOKEN },
-							{ Key: 'Count', Value: member.merge_fields.COUNT },
-							{ Key: 'RSVP', Value: member.merge_fields.RSVP },
-							{ Key: 'Dietary', Value: member.merge_fields.DIETARY },
-							{ Key: 'Lang', Value: member.merge_fields.LANG }
-						]
-					}, (err, res) => {
-					  if (err) console.log(err);
-					  console.log("Updated:" + member.email_address);
-					  done();
-					});
-
-				});
-
-			});
-
-			async.parallelLimit(calls, 10, () => {
-
-				console.log("Done.");
+			if (err) {
+			    console.log(err);
+				response.status(500);
+			    response.send();
+			} else {
 				response.status(200);
-				response.send();
-
-			});
+			    response.send();
+			}
 
 		});
+
+	});
 
 });
 

@@ -53,11 +53,19 @@
 			<input type="hidden" value="{{webhook.id}}" name="WebhookID"/>
 			<input type="hidden" value="{{token}}" name="token" />
 			<label for="Status"><input type="checkbox" {{#if webhook.active}}checked{{/if}} name="Status" id="Status"/> Notify these people when RSVPs update:</label>
-		<ul>
-			{{#each notify}}
-				<li>{{Name}} ({{EmailAddress}})</li>
-			{{/each}}
-		</ul>
+			{{#if notifyAdmin}}
+			<p class="notify-admin"><i class="fa fa-user-secret"></i> Admins are set to get notifications.</p>
+			{{/if}}
+			<div class="members">
+				<ul>
+					{{#each notify}}
+						<li><h3><i class="fa fa-user{{#if isAdmin}}-secret{{/if}}"></i>
+							{{Name}}</h3>
+							<p>{{EmailAddress}}<p></li>
+					{{/each}}
+				</ul>
+			</div>
+			<hr  />
 		<p><button class="button" type="submit">Save</button></p>
 		</div>
 	</form>

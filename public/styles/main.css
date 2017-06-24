@@ -308,3 +308,9 @@ textarea {
   font-style: italic;
   margin-bottom: -1rem
 }
+
+.notify-admin {
+  margin-left: 2rem;
+  margin-top: 0rem;
+  font-size: 14px;
+}

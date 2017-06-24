@@ -11,8 +11,8 @@ const clientID = process.env.CREATESEND_CLIENT;
 const loginEmail = process.env.CREATESEND_EMAIL_LOGIN;
 const notifyEmail = process.env.CREATESEND_EMAIL_NOTIFY;
 
-const notifyAdmin = !process.env.RSVP_NOTIFY_IGNOREADMIN;
-const appURL = !process.env.RSVP_BASEURL;
+const notifyAdmin = !(process.env.RSVP_NOTIFY_IGNOREADMIN==="true" ? true : false);
+const appURL = process.env.RSVP_BASEURL;
 
 var app = express();
 
@@ -66,6 +66,7 @@ var fetchNotified = function(done) {
 				res.forEach(admin => {
 					calls.push(done => {
 						createsend.account.getAdministratorDetails(admin.emailAddress, (err, res) => {
+							res['isAdmin'] = true;
 							admins.push(res);
 							done();
 						});
@@ -350,7 +351,8 @@ app.get('/list', (request, response) => {
 				not_coming,
 				NOT_COMING,
 				waiting,
-				WAITING
+				WAITING,
+				notifyAdmin
 			});
 
 		});

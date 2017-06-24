@@ -122,7 +122,8 @@ input[type=email] {
   border-radius: 0;
 }
 
-#dietary-form .button {
+#dietary-form .button,
+#notification-settings .button {
   background: #405579;
   float: right;
 }
@@ -168,12 +169,14 @@ h2 {
   margin-top: 6rem;
 }
 
-#dietary-form h2 {
+#dietary-form h2,
+#notification-settings h2 {
   text-align: left;
   margin-top: 1rem;
 }
 
-#dietary-form h1 {
+#dietary-form h1,
+#notification-settings h1 {
   padding-top: 3rem;
   margin-right: -2rem;
 }
@@ -199,7 +202,8 @@ textarea {
   display: inline;
 }
 
-#dietary-form {
+#dietary-form,
+#notification-settings {
   display: none;
   position: fixed;
   top: 3rem;
@@ -218,7 +222,8 @@ textarea {
   transition: 100ms;
 }
 
-#dietary:hover ~ #dietary-form {
+#dietary:hover ~ #dietary-form,
+#notify:hover ~ #notification-settings {
   top: 20vh;
   bottom: 20vh;
   right: 20vh;
@@ -226,18 +231,21 @@ textarea {
   filter: blur(5px);
 }
 
-.dietary-wrapper {
+.dietary-wrapper,
+.notify-wrapper{
     min-height: 10rem;
     padding-left: 2rem;
     padding-right: 2rem;
     max-width: 32em;
 }
 
-#dietary {
+#dietary,
+#notify {
   display: none;
 }
 
-#dietary:target {
+#dietary:target,
+#notify:target {
   display: block;
   position: fixed;
   top: 0;
@@ -248,7 +256,8 @@ textarea {
   z-index: 1000;
 }
 
-#dietary:hover {
+#dietary:hover,
+#notify:hover{
   background: rgba(0,0,0,0.1);
   filter: none;
 }
@@ -258,7 +267,8 @@ textarea {
   display: block;
 }
 
-#dietary:target ~ #dietary-form {
+#dietary:target ~ #dietary-form,
+#notify:target ~ #notification-settings {
   display: block;
   display: flex;
 }

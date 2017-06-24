@@ -7,6 +7,7 @@ var uid = require('rand-token').uid;
 
 var createsend = new CreateSend({ apiKey: process.env.CREATESEND_KEY});
 var list = process.env.CREATESEND_LIST;
+var clientID = process.env.CREATESEND_CLIENT;
 
 var app = express();
 
@@ -45,6 +46,36 @@ var createRSVP = function (result) {
 var generateToken = function (result) {
 	return uid(10);
 }
+
+var fetchNotified = function(done) {
+
+	async.parallel([
+		(done) => { createsend.clients.getPeople(clientID, done) },
+		(done) => { 
+			var admins = [];
+			if(!process.env.CREATESEND_NOTIFY_ADMIN) return done(null, admins);
+			createsend.account.getAdministrators((err, res) => {
+
+				var calls = [];
+
+				res.forEach(admin => {
+					calls.push(done => {
+						createsend.account.getAdministratorDetails(admin.emailAddress, (err, res) => {
+							admins.push(res);
+							done();
+						});
+					 });
+				});
+
+				async.parallelLimit(calls, 10, (err, res) => {
+					done(err, admins);
+				});
+			});
+		}
+	], (err, results) => {
+		done(err, results[1].concat(results[0]));
+	});
+};
 
 app.engine('handlebars', exphbs({
 	defaultLayout: 'main',
@@ -222,31 +253,93 @@ app.get('/list', (request, response) => {
 	var token = request.query ? request.query['token'] : null;
 
 	if(token && token == process.env.CREATESEND_KEY) {
+		var COMING = 0, NOT_COMING = 0, WAITING = 0;
+		var coming = [], not_coming = [], waiting = [];
 
-		createsend.lists.getActiveSubscribers(list, '', (err, res) => {
+		async.parallelLimit({
+			webhook: (done) => {
 
-			var COMING = 0, NOT_COMING = 0, WAITING = 0;
-			var coming = [], not_coming = [], waiting = [];
+				createsend.lists.getWebhooks(list, (err, res) => {
+					var response;
 
-			res.Results.forEach(function(result){
+					if(err) return done(err);
 
-				var member = createRSVP(result);
+					res.forEach( function(webhook) {
+						if(/\/notify$/.test(webhook.Url)) {
+							response = webhook;
+						}
+					});
 
-				if(member.hasRSVP) {
-					if(member.RSVP == true) {
-						COMING += parseInt(member.Count);
-						coming.push(member);
+					if(!response) {
+						// If the webhook doesn’t exist yet, create it.
+						createsend.lists.createWebhook(list, {
+							    "Events": [ "Update" ],
+							    "Url": "http://ludnat.wendzich.com/notify",
+							    "PayloadFormat": "json"
+							}, (err, res) => {
+								done(err, {
+									id: res,
+									active: true
+								});
+							});
 					} else {
-						NOT_COMING += parseInt(member.Count);
-						not_coming.push(member);
+						// Otherwise, return the details.
+						done(null, {
+							id: response.WebhookID,
+							active: (response.Status === "Active" ? true : false)
+						});
 					}
-				} else {
-					WAITING += parseInt(member.Count);
-					waiting.push(member);
-				}
-			});
+
+				});
+
+			},
+
+			notify: fetchNotified,
+
+			subscribers: (done) => {
+
+				createsend.lists.getActiveSubscribers(list, '', (err, res) => {
+
+					if(err) return done(err);
+
+					res.Results.forEach(function(result){
+
+						var member = createRSVP(result);
+
+						if(member.hasRSVP) {
+							if(member.RSVP == true) {
+								COMING += parseInt(member.Count);
+								coming.push(member);
+							} else {
+								NOT_COMING += parseInt(member.Count);
+								not_coming.push(member);
+							}
+						} else {
+							WAITING += parseInt(member.Count);
+							waiting.push(member);
+						}
+					});
+
+					done();
+
+				});
+			}
+
+		}, 10, (err, res) => {
+
+			if(err) {
+				console.error(err);
+				response.status(500);
+				return response.send();
+			}
+
+			var webhook = res.webhook;
+			var notify = res.notify;
 
 			response.render('list', {
+				token,
+				webhook,
+				notify,
 				coming,
 				COMING,
 				not_coming,
@@ -254,6 +347,7 @@ app.get('/list', (request, response) => {
 				waiting,
 				WAITING
 			});
+
 		});
 
 	} else {
@@ -265,52 +359,55 @@ app.get('/list', (request, response) => {
 // Send a notification to Natalie and myself that an RSVP has occurred.
 app.post('/notify', (request, response) => {
 
-	var calls= [];
+	fetchNotified( (err, res) => {
 
-	request.body.Events.forEach(event => {
-		var rsvp = createRSVP(event);
-		var details = {
-			smartEmailID: '4829db53-0d8d-4289-b91c-90df6f76443c',
-			to: [
-				"Ludwig Wendzich <ludwig@wendzich.com>",
-				"Natalie Theron <theron.natalie@gmail.com>"
-			],
-			data: {
-			    "Name": rsvp.Name,
-				"RSVP": rsvp.RSVP,
-				"Count": rsvp.Count,
-				"Dietary": rsvp.Dietary || '',
-				"Token": rsvp.Token,
-				"email": rsvp.Email
-			}
+		var to = [];
+		var calls= [];
+
+		// Create To Block
+		if(res.length>0) {
+			res.forEach(person => {
+				to.push(person.Name + " <" + person.EmailAddress + ">");
+			});
 		}
 
-		calls.push((done)=> {
-			createsend.transactional.sendSmartEmail(details, done);
+		request.body.Events.forEach(event => {
+			var rsvp = createRSVP(event);
+			var details = {
+				smartEmailID: '4829db53-0d8d-4289-b91c-90df6f76443c',
+				to: to,
+				data: {
+				    "Name": rsvp.Name,
+					"RSVP": rsvp.RSVP,
+					"Count": rsvp.Count,
+					"Dietary": rsvp.Dietary || '',
+					"Token": rsvp.Token,
+					"email": rsvp.Email
+				}
+			}
+
+			calls.push((done)=> {
+				createsend.transactional.sendSmartEmail(details, done);
+			});
+		});
+
+		async.parallelLimit(calls, 10, (err, res) => {
+			if (err) {
+			    console.log(err);
+				response.status(500);
+			    response.send();
+			} else {
+				response.status(200);
+			    response.send();
+			}
 		});
 	});
 
-	async.parallelLimit(calls, 10, (err, res) => {
-		if (err) {
-		    console.log(err);
-			response.status(500);
-		    response.send();
-		} else {
-			response.status(200);
-		    response.send();
-		}
-	});
-
-
 });
 
-app.get('/create-webhook', (request, response) => {
+app.get('/list-webhook', (request, response) => {
 
-	createsend.lists.createWebhook(list, {
-	    "Events": [ "Update" ],
-	    "Url": "http://ludnat.wendzich.com/notify",
-	    "PayloadFormat": "json"
-	}, (err, res) => {
+	createsend.lists.getWebhooks(list, (err, res) => {
 		console.log(res);
 		response.status(200);
 		response.send();
@@ -318,14 +415,38 @@ app.get('/create-webhook', (request, response) => {
 
 });
 
-app.get('/test-webhook', (request, response) => {
+app.post('/update-notify', (request, response) => {
 
-	createsend.lists.testWebhook(cmList, 'a4e05a7a89bd9d670062efd89faa6523', (err, res) => {
+	var p = request.body;
+	var event;
+
+	if(p.token && p.token == process.env.CREATESEND_KEY) {
+
+		if(p.Status === "on") {
+			event = "activateWebhook";
+		} else {
+			event = "deactivateWebhook";
+		}
+
+		createsend.lists[event](list, p.WebhookID, (err, res) => {
+			console.log(err, res);
+			response.redirect('/list?token='+p.token);
+		});	
+
+
+	} else {
+		response.status(500);
+		response.send();
+	}
+
+});
+
+app.get('/remove-webhook', (request, response) => {
+	createsend.lists.deleteWebhook(list, '3ad6e767222ebbf2b33ed1c2d342770e', (err, res) => {
 		console.log(err, res);
 		response.status(200);
 		response.send();
 	});
-
 });
 
 // Generate tokens for Subscribers without Tokens.

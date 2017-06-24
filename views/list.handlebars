@@ -1,45 +1,65 @@
 <header>
 	<h1>Who’s coming, or not</h1>
+	<p><a class="button" href="#notify">Update Notification Settinsg</a></p>
 </header>
 <footer>
-<div class="members">
-	<div class="coming">
-		<h1>{{COMING}}</h1>
-		<h2>Coming</h2>
-		<hr>
-		<ul>
-		{{#each coming}}
-				<li>
-					<h3><a class="hidden-link" href="/?token={{Token}}&email={{Email}}"><i class="fa fa-check"></i> {{Name}}</a></h3>
-					<p>{{Dietary}}</p>
-				</li>
-		{{/each}}
-		</ul>
+	<div id="rsvps" class="members">
+		<div class="coming">
+			<h1>{{COMING}}</h1>
+			<h2>Coming</h2>
+			<hr>
+			<ul>
+			{{#each coming}}
+					<li>
+						<h3><a class="hidden-link" href="/?token={{Token}}&email={{Email}}"><i class="fa fa-check"></i> {{Name}}</a></h3>
+						<p>{{Dietary}}</p>
+					</li>
+			{{/each}}
+			</ul>
+		</div>
+		<div class="not_coming">
+			<h1>{{NOT_COMING}}</h1>
+			<h2>Not Coming</h2>
+			<hr>
+			<ul>
+			{{#each not_coming}}
+					<li>
+						<h3><a class="hidden-link" href="/?token={{Token}}&email={{Email}}"><i class="fa fa-close"></i> {{Name}}</a></h3>
+						<p>{{Dietary}}</p>
+					</li>
+			{{/each}}
+			</ul>
+		</div>
+		<div class="waiting">
+			<h1>{{WAITING}}</h1>
+			<h2>Waiting</h2>
+			<hr>
+			<ul>
+			{{#each waiting}}
+					<li>
+						<h3><a class="hidden-link" href="/?token={{Token}}&email={{Email}}"><i class="fa fa-clock-o"></i> {{Name}}</a></h3>
+						<p>{{Dietary}}</p>
+					</li>
+			{{/each}}
+			</ul>
+		</div>
 	</div>
-	<div class="not_coming">
-		<h1>{{NOT_COMING}}</h1>
-		<h2>Not Coming</h2>
-		<hr>
+
+	<a href="#rsvps" id="notify"></a>
+	<form id="notification-settings" name="notify" action="/update-notify" method="POST">
+		<div class="notify-wrapper">
+		<h1>Notify me!</h1>
+			<h2>Send Notification Emails</h2>
+			<input type="hidden" value="{{webhook.id}}" name="WebhookID"/>
+			<input type="hidden" value="{{token}}" name="token" />
+			<label for="Status"><input type="checkbox" {{#if webhook.active}}checked{{/if}} name="Status" id="Status"/> Notify these people when RSVPs update:</label>
 		<ul>
-		{{#each not_coming}}
-				<li>
-					<h3><a class="hidden-link" href="/?token={{Token}}&email={{Email}}"><i class="fa fa-close"></i> {{Name}}</a></h3>
-					<p>{{Dietary}}</p>
-				</li>
-		{{/each}}
+			{{#each notify}}
+				<li>{{Name}} ({{EmailAddress}})</li>
+			{{/each}}
 		</ul>
-	</div>
-	<div class="waiting">
-		<h1>{{WAITING}}</h1>
-		<h2>Waiting</h2>
-		<hr>
-		<ul>
-		{{#each waiting}}
-				<li>
-					<h3><a class="hidden-link" href="/?token={{Token}}&email={{Email}}"><i class="fa fa-clock-o"></i> {{Name}}</a></h3>
-					<p>{{Dietary}}</p>
-				</li>
-		{{/each}}
-		</ul>
-	</div>
+		<p><button class="button" type="submit">Save</button></p>
+		</div>
+	</form>
+
 </footer>

@@ -87,6 +87,7 @@ app.engine('handlebars', exphbs({
 	defaultLayout: 'main',
 	helpers: {
 		pluralize: function(number, singular, plural) {
+			number = parseInt(number);
 		    if (number === 1)
 		        return singular;
 		    else

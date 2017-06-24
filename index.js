@@ -6,8 +6,13 @@ var async = require('async');
 var uid = require('rand-token').uid;
 
 var createsend = new CreateSend({ apiKey: process.env.CREATESEND_KEY});
-var list = process.env.CREATESEND_LIST;
-var clientID = process.env.CREATESEND_CLIENT;
+const list = process.env.CREATESEND_LIST;
+const clientID = process.env.CREATESEND_CLIENT;
+const loginEmail = process.env.CREATESEND_EMAIL_LOGIN;
+const notifyEmail = process.env.CREATESEND_EMAIL_NOTIFY;
+
+const notifyAdmin = !process.env.RSVP_NOTIFY_IGNOREADMIN;
+const appURL = !process.env.RSVP_BASEURL;
 
 var app = express();
 
@@ -53,7 +58,7 @@ var fetchNotified = function(done) {
 		(done) => { createsend.clients.getPeople(clientID, done) },
 		(done) => { 
 			var admins = [];
-			if(!process.env.CREATESEND_NOTIFY_ADMIN) return done(null, admins);
+			if(!notifyAdmin) return done(null, admins);
 			createsend.account.getAdministrators((err, res) => {
 
 				var calls = [];
@@ -208,7 +213,7 @@ app.post('/login', (request, response) => {
 
 	// Create a details object
 	var details = {
-		smartEmailID: '43f81b90-4160-4226-bdeb-e815c408f8f5'
+		smartEmailID: loginEmail
 	};
 
 	if(p.email) {
@@ -274,7 +279,7 @@ app.get('/list', (request, response) => {
 						// If the webhook doesn’t exist yet, create it.
 						createsend.lists.createWebhook(list, {
 							    "Events": [ "Update" ],
-							    "Url": "http://ludnat.wendzich.com/notify",
+							    "Url": appURL + "/notify",
 							    "PayloadFormat": "json"
 							}, (err, res) => {
 								done(err, {
@@ -356,7 +361,7 @@ app.get('/list', (request, response) => {
 
 });
 
-// Send a notification to Natalie and myself that an RSVP has occurred.
+// Send a notification to those on the list that an RSVP has occurred.
 app.post('/notify', (request, response) => {
 
 	fetchNotified( (err, res) => {
@@ -374,7 +379,7 @@ app.post('/notify', (request, response) => {
 		request.body.Events.forEach(event => {
 			var rsvp = createRSVP(event);
 			var details = {
-				smartEmailID: '4829db53-0d8d-4289-b91c-90df6f76443c',
+				smartEmailID: notifyEmail,
 				to: to,
 				data: {
 				    "Name": rsvp.Name,
@@ -405,6 +410,7 @@ app.post('/notify', (request, response) => {
 
 });
 
+// Useful for debugging webhook code.
 app.get('/list-webhook', (request, response) => {
 
 	createsend.lists.getWebhooks(list, (err, res) => {
@@ -415,6 +421,7 @@ app.get('/list-webhook', (request, response) => {
 
 });
 
+// Activate/Deactivate the webhook
 app.post('/update-notify', (request, response) => {
 
 	var p = request.body;
@@ -439,14 +446,6 @@ app.post('/update-notify', (request, response) => {
 		response.send();
 	}
 
-});
-
-app.get('/remove-webhook', (request, response) => {
-	createsend.lists.deleteWebhook(list, '3ad6e767222ebbf2b33ed1c2d342770e', (err, res) => {
-		console.log(err, res);
-		response.status(200);
-		response.send();
-	});
 });
 
 // Generate tokens for Subscribers without Tokens.

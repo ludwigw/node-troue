@@ -2,6 +2,8 @@
 
 A CampaignMonitor List backed RSVP app that runs on Node in Heroku.
 
+This app [used to be](https://github.com/ludwigw/node-troue/commit/7872fae83ef21c1875d7b004472581345448418b) backed by Mailchimp, but [Mailchimp don’t want you using their service for weddings](http://ludwig.nz/2017/06/23/dont-use-mailchimp-for-weddings/) so it uses CampaignMonitor now, instead.
+
 ## Running Locally
 
 Make sure you have the following file, `env.sh`:

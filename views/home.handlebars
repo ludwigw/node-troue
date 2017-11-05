@@ -16,7 +16,7 @@
 				<footer>
 					<a id="dietary" href="#rsvp-row"></a>
 					{{#if RSVP}}
-						<div>We’re expecting {{Count}} of you. {{#> regret}}But {{pluralize Count "I" "we"}}  can’t come.{{/regret}}</div>
+						<div>We’re expecting {{Count}} of you. For dinner, you’ll be seated at the <strong>{{Table}}</strong> table.</div><div>{{#> regret}}But {{pluralize Count "I" "we"}}  can’t come.{{/regret}}</div>
 					{{else}}
 						<p id="rsvp-row">We think you aren’t coming. {{#> accept_start}}{{pluralize Count "I" "We"}}  can now!{{/accept_start}}</p>
 						{{> accept_end}}

@@ -261,7 +261,7 @@ app.get('/list', (request, response) => {
 
 	if(token && token == process.env.CREATESEND_KEY) {
 		var COMING = 0, NOT_COMING = 0, WAITING = 0;
-		var coming = [], not_coming = [], waiting = [];
+		var coming = [], not_coming = [], waiting = [], tables = {}, TABLES = [];
 
 		async.parallelLimit({
 			webhook: (done) => {
@@ -317,6 +317,13 @@ app.get('/list', (request, response) => {
 							if(member.RSVP == true) {
 								COMING += parseInt(member.Count);
 								coming.push(member);
+
+								if(tables[member.Table]) {
+									tables[member.Table] += parseInt(member.Count);
+								} else {
+									tables[member.Table] = parseInt(member.Count);
+								}
+
 							} else {
 								NOT_COMING += parseInt(member.Count);
 								not_coming.push(member);
@@ -343,6 +350,14 @@ app.get('/list', (request, response) => {
 			var webhook = res.webhook;
 			var notify = res.notify;
 
+			for(var table in tables) {
+				TABLES.push({
+					Name: table,
+					Count: tables[table]
+				});
+			}
+
+
 			response.render('list', {
 				token,
 				webhook,
@@ -353,7 +368,8 @@ app.get('/list', (request, response) => {
 				NOT_COMING,
 				waiting,
 				WAITING,
-				notifyAdmin
+				notifyAdmin,
+				TABLES
 			});
 
 		});

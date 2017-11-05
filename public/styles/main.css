@@ -309,6 +309,30 @@ textarea {
   margin-bottom: -1rem
 }
 
+.tables {
+  display: flex;
+  text-align: left;
+  justify-content: center;
+  flex-wrap: wrap;
+  text-align: center;
+}
+
+.tables > li {
+  flex: 1 1 12em;
+  max-width: 12em;
+  padding-left:1rem;
+  padding-right:1rem;
+}
+
+.table-name {
+
+}
+
+.table-count {
+  font-size: 2em;
+  margin-top: -0.5em;;
+}
+
 .notify-admin {
   margin-left: 2rem;
   margin-top: 0rem;

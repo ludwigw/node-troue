@@ -1,8 +1,20 @@
 <header>
-	<h1>Who’s coming, or not</h1>
-	<p><a class="button" href="#notify">Update Notification Settings</a></p>
+	<h1>Tables</h1>
+	<ul class="tables">
+		{{#each TABLES}}
+		<li class="table">
+			<h3 class="table-name">{{Name}}</h2>
+			<p class="table-count">{{Count}}</p>
+			<hr>
+		</li>
+		{{/each}}
+	</ul>
 </header>
 <footer>
+	<h1>Who’s coming, or not</h1>
+	<p><a class="button" href="#notify">Update Notification Settings</a></p>
+	<hr>
+
 	<div id="rsvps" class="members">
 		<div class="coming">
 			<h1>{{COMING}}</h1>
@@ -12,7 +24,7 @@
 			{{#each coming}}
 					<li>
 						<h3><a class="hidden-link" href="/?token={{Token}}&email={{Email}}"><i class="fa fa-check"></i> {{Name}}</a></h3>
-						<p>{{Dietary}}</p>
+						<p><strong>{{Table}}</strong>{{#Dietary}}—{{.}}{{/Dietary}}</p>
 					</li>
 			{{/each}}
 			</ul>
